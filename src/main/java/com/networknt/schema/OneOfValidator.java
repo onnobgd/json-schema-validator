@@ -144,11 +144,16 @@ public class OneOfValidator extends BaseJsonValidator implements JsonValidator {
 //        	return Collections.unmodifiableSet(errors);
 //        }
 
+        boolean allConstantsMatch=false;
         for (ShortcutValidator validator : schemas) {
             if (!validator.allConstantsMatch(node)) {
                 // take a shortcut: if there is any constant that does not match,
                 // we can bail out of the validation
                 continue;
+            } else {
+                if (validator.constants.size()>0) {
+                    allConstantsMatch=true;
+                }
             }
 
             // get the current validator
@@ -173,8 +178,8 @@ public class OneOfValidator extends BaseJsonValidator implements JsonValidator {
             for (Iterator<ValidationMessage> it = errors.iterator(); it.hasNext(); ) {
                 ValidationMessage msg = it.next();
 
-                if (ValidatorTypeCode.ADDITIONAL_PROPERTIES.getValue().equals(msg.getType())) {
-                    it.remove();
+                if (!allConstantsMatch && ValidatorTypeCode.ADDITIONAL_PROPERTIES.getValue().equals(msg.getType())) {
+                   it.remove();
                 }
             }
             if (errors.isEmpty()) {
